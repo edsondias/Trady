@@ -6,7 +6,7 @@ using Trady.Core.Infrastructure;
 
 namespace Trady.Analysis.Indicator
 {
-    public class FuncAnalyzable<TInput, TOutput> : NumericAnalyzableBase<TInput, TInput, TOutput>, IFuncAnalyzable<TOutput> 
+    public class FuncAnalyzable<TInput, TOutput> : NumericAnalyzableBase<TInput, TInput, TOutput>, IFuncAnalyzable<TOutput>
     {
         private readonly Func<IReadOnlyList<TInput>, int, IReadOnlyList<decimal>, IAnalyzeContext<TInput>, decimal?> _func;
         private readonly IAnalyzeContext<TInput> _ctx;

@@ -9,6 +9,9 @@ Trady is a handy library for computing technical indicators, and targets to be a
 ## Read Before You Use
 This library is a hobby project, and would probably making breaking changes, use with care when in production.
 
+## About contributions (30/12/2017)
+I've noticed that there's a lot of enthusiasts continually contributing to this project. I have to say thank you to all of you giving your precious time & effort on creating issues/ PRs or making suggestions. I've been busy for these few months, and do not have time on reviewing all the works, and I have to apologize on this. At the same time, I'm looking for collaborators who could help reviewing PRs & maintaining this repo, please let me know if you're interested in it :) Again, thanks to all of you & Happy New Year :D
+
 ## Currently Available Features
 * Stock data feeding (via CSV File, [Quandl.NET](https://github.com/lppkarl/Quandl.NET), [YahooFinanceApi](https://github.com/lppkarl/YahooFinanceApi), [StooqApi](https://github.com/lppkarl/StooqApi), [Nuba.Finance.Google](https://github.com/nubasoftware/Nuba.Finance.Google))
 * Indicator computing (including SMA, EMA, RSI, MACD, BB, etc.)
@@ -16,15 +19,20 @@ This library is a hobby project, and would probably making breaking changes, use
 * Strategy backtesting by buy/sell rule
 
 ## Recent update
-### v3.1.0-beta0
+### v3.1
+* Fix StooqImporter, migrated to .NET Standard 2.0
+* Temporarily remove support for QuandlImporter & GoogleFinanceImporter
+* Fix divide by zero issue for various indicators
+* Fix null reference to diff/pcdiff/sma, etc.
+* Fix YahooFinanceImporter to use local time for query
+* Update dependencies for csvImporter
+* Boost performance for RuleExecutor & Backtesting
 * Added Harami (thanks to @richardsjoberg)
 * Added indicators: ParabolicStopAndReverse (Sar), DynamicMomentumIndex(Dymoi), RelativeMomentumIndex (Rmi), NetMomentumOscillator (Nmo), StochasticsRsiOscillator (StochRsi), StochasticsMomentumIndex (Smi), CommodityChannelIndex (Cci)
 * IOhlcv interface is extracted, any class that implements IOhlcv interface can be used to calculate indicators (thanks to @LadislavBohm)
 * DateTimeOffset is used as default instead of DateTime
-
 * Renamed IndexedCandle.Execute to IndexedCandle.Eval
 * Renamed ClosePriceChange to Momentum (Mtm), ClosePricePercentageChange to RateOfChange (Roc)
-
 * Fix potential crash when computing EfficiencyRatio (thanks to @Mike-EEE)
 
 ### v3.0.1
@@ -190,6 +198,11 @@ Nuget package is available in modules, please install the package according to t
 
 <a name="StrategyBuildingAndBacktesting"></a>
 ### Strategy building & backtesting
+    // Import your candles
+    var importer = new YahooFinanceImporter();
+    var fb = await importer.ImportAsync("FB");
+    var aapl = await importer.ImportAsync("AAPL");
+
     // Build buy rule & sell rule based on various patterns
     var buyRule = Rule.Create(c => c.IsFullStoBullishCross(14, 3, 3))
         .And(c => c.IsMacdOscBullish(12, 26, 9))
@@ -202,8 +215,8 @@ Nuget package is available in modules, please install the package according to t
 
     // Create portfolio instance by using PortfolioBuilder
     var runner = new Builder()
-        .Add(equity, 10)
-        .Add(equity2, 30)
+        .Add(fb, 10)
+        .Add(aapl, 30)
         .Buy(buyRule)
         .Sell(sellRule)
         .Build();

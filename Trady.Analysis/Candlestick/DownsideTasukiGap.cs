@@ -10,6 +10,8 @@ namespace Trady.Analysis.Candlestick
     /// <summary>
     /// Reference: http://www.investopedia.com/terms/d/downside-tasuki-gap.asp
     /// </summary>
+    /// <typeparam name="TInput"></typeparam>
+    /// <typeparam name="TOutput"></typeparam>
     public class DownsideTasukiGap<TInput, TOutput> : AnalyzableBase<TInput, (decimal Open, decimal High, decimal Low, decimal Close), bool?, TOutput>
     {
         private DownTrendByTuple _downTrend;
@@ -35,8 +37,10 @@ namespace Trady.Analysis.Candlestick
 
         protected override bool? ComputeByIndexImpl(IReadOnlyList<(decimal Open, decimal High, decimal Low, decimal Close)> mappedInputs, int index)
         {
-            if (index < 2) return null;
-            bool isWhiteIOhlcvDataWithinGap = mappedInputs[index].Close < mappedInputs[index - 2].Low && mappedInputs[index].Close > mappedInputs[index - 1].High;
+            if (index < 2)
+                return default;
+
+            var isWhiteIOhlcvDataWithinGap = mappedInputs[index].Close < mappedInputs[index - 2].Low && mappedInputs[index].Close > mappedInputs[index - 1].High;
             return (_downTrend[index - 1] ?? false) &&
                 _bearish[index - 2] &&
                 mappedInputs[index - 2].Low > mappedInputs[index - 1].High &&
